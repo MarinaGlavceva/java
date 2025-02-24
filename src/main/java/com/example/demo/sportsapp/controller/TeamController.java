@@ -1,6 +1,6 @@
 package com.example.demo.sportsapp.controller;
 
-import com.example.demo.sportsapp.dto.TeamDTO;
+import com.example.demo.sportsapp.entity.dto.TeamDTO;
 import com.example.demo.sportsapp.service.TeamService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class TeamController {
         return ResponseEntity.ok(teamService.getAllTeams());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<TeamDTO> getTeamById(@PathVariable Long id) {
         return ResponseEntity.ok(teamService.getTeamById(id));
     }
@@ -32,12 +32,12 @@ public class TeamController {
         return ResponseEntity.ok(teamService.createTeam(teamDTO));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<TeamDTO> updateTeam(@PathVariable Long id, @RequestBody TeamDTO teamDTO) {
         return ResponseEntity.ok(teamService.updateTeam(id, teamDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
         return ResponseEntity.noContent().build();

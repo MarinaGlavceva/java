@@ -1,15 +1,14 @@
-package com.example.demo.sportsapp.dto;
+package com.example.demo.sportsapp.entity.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
+@Builder
 public class PlayerDTO {
     // Геттеры и сеттеры
     private Long id;
     private String name;
     private int age;
     private Long teamId; // ID команды, к которой принадлежит игрок
-
 }

@@ -1,6 +1,6 @@
 package com.example.demo.sportsapp.controller;
 
-import com.example.demo.sportsapp.dto.MatchDTO;
+import com.example.demo.sportsapp.entity.dto.MatchDTO;
 import com.example.demo.sportsapp.service.MatchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class MatchController {
         return ResponseEntity.ok(matchService.getAllMatches());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<MatchDTO> getMatchById(@PathVariable Long id) {
         return ResponseEntity.ok(matchService.getMatchById(id));
     }
@@ -32,12 +32,12 @@ public class MatchController {
         return ResponseEntity.ok(matchService.createMatch(matchDTO));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<MatchDTO> updateMatch(@PathVariable Long id, @RequestBody MatchDTO matchDTO) {
         return ResponseEntity.ok(matchService.updateMatch(id, matchDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteMatch(@PathVariable Long id) {
         matchService.deleteMatch(id);
         return ResponseEntity.noContent().build();

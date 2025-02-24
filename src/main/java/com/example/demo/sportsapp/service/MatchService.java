@@ -1,6 +1,6 @@
 package com.example.demo.sportsapp.service;
 
-import com.example.demo.sportsapp.dto.MatchDTO;
+import com.example.demo.sportsapp.entity.dto.MatchDTO;
 import com.example.demo.sportsapp.entity.Match;
 import com.example.demo.sportsapp.repository.MatchRepository;
 import org.springframework.stereotype.Service;

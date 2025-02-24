@@ -1,10 +1,19 @@
 package com.example.demo.sportsapp.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
+
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "matches")
+@Table(name = "match")
+@Data
 public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +29,5 @@ public class Match {
     @JoinColumn(name = "away_team_id")
     private Team awayTeam;
 
-    // Геттеры и сеттеры
+
 }
