@@ -3,10 +3,12 @@ package com.example.demo.sportsapp.service;
 import com.example.demo.sportsapp.entity.Coach;
 import com.example.demo.sportsapp.entity.dto.CoachDTO;
 import com.example.demo.sportsapp.repository.CoachRepository;
+
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class CoachService {
@@ -18,15 +20,27 @@ public class CoachService {
     }
 
     public List<CoachDTO> getAllCoaches() {
-        return coachRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+
+        List<Coach> coaches = coachRepository.findAll();
+        List<CoachDTO> resultList = new ArrayList<>();
+        for (Coach coach : coaches) {
+            resultList.add(CoachDTO.builder()
+                                   .id(coach.getId())
+                                   .name(coach.getName())
+                                   .teamId(coach.getTeam().getId())
+                                   .build());
+        }
+        return resultList;
     }
 
     public CoachDTO getCoachById(Long id) {
-        return coachRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Coach not found"));
+        Optional<Coach> coach = coachRepository.findById(id);
+
+        return CoachDTO.builder()
+                .id(coach.get().getId())
+                .name(coach.get().getName())
+                .teamId(coach.get().getTeam().getId())
+                .build();
     }
 
     public CoachDTO createCoach(CoachDTO coachDTO) {
@@ -36,22 +50,27 @@ public class CoachService {
         return convertToDTO(coach);
     }
 
+    private CoachDTO convertToDTO(Coach coach) {
+
+        return CoachDTO.builder()
+                .id(coach.getId())
+                .name(coach.getName())
+                .build();
+    }
+
     public CoachDTO updateCoach(Long id, CoachDTO coachDTO) {
-        Coach coach = coachRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Coach not found"));
+        Coach coach = new Coach();
+        if (coachRepository.findById(id).isPresent()) {
+            coach = coachRepository.findById(id).get();
+        }
         coach.setName(coachDTO.getName());
         coachRepository.save(coach);
         return convertToDTO(coach);
     }
 
     public void deleteCoach(Long id) {
-        coachRepository.deleteById(id);
-    }
-
-    private CoachDTO convertToDTO(Coach coach) {
-        CoachDTO dto = new CoachDTO();
-        dto.setId(coach.getId());
-        dto.setName(coach.getName());
-        return dto;
+        if (coachRepository.findById(id).isPresent()) {
+            coachRepository.deleteById(id);
+        }
     }
 }
