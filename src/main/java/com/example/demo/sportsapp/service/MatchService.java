@@ -1,12 +1,13 @@
 package com.example.demo.sportsapp.service;
 
-import com.example.demo.sportsapp.entity.dto.MatchDTO;
 import com.example.demo.sportsapp.entity.Match;
+import com.example.demo.sportsapp.entity.dto.MatchDTO;
 import com.example.demo.sportsapp.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class MatchService {
@@ -18,15 +19,26 @@ public class MatchService {
     }
 
     public List<MatchDTO> getAllMatches() {
-        return matchRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        List<Match> matches = matchRepository.findAll();
+        List<MatchDTO> resultList = new ArrayList<>();
+        for (Match match : matches) {
+            resultList.add(MatchDTO.builder()
+                    .id(match.getId())
+                    .homeTeamId(match.getHomeTeam().getId())
+                    .awayTeamId(match.getAwayTeam().getId())
+                    .build());
+        }
+        return resultList;
     }
 
     public MatchDTO getMatchById(Long id) {
-        return matchRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
+        Optional<Match> match = matchRepository.findById(id);
+
+        return MatchDTO.builder()
+                .id(match.get().getId())
+                .homeTeamId(match.get().getHomeTeam().getId())
+                .awayTeamId(match.get().getAwayTeam().getId())
+                .build();
     }
 
     public MatchDTO createMatch(MatchDTO matchDTO) {
@@ -35,20 +47,30 @@ public class MatchService {
         return convertToDTO(match);
     }
 
+    private MatchDTO convertToDTO(Match match) {
+
+        return MatchDTO.builder()
+                .id(match.getId())
+                .homeTeamId(match.getHomeTeam().getId())
+                .awayTeamId(match.getAwayTeam().getId())
+                .build();
+    }
+
+
+
     public MatchDTO updateMatch(Long id, MatchDTO matchDTO) {
-        Match match = matchRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
+        Match match = new Match();
+        if (matchRepository.findById(id).isPresent()) {
+            match = matchRepository.findById(id).get();
+        }
         matchRepository.save(match);
         return convertToDTO(match);
     }
 
     public void deleteMatch(Long id) {
-        matchRepository.deleteById(id);
+        if (matchRepository.findById(id).isPresent()) {
+            matchRepository.deleteById(id);
+        }
     }
 
-    private MatchDTO convertToDTO(Match match) {
-        MatchDTO dto = new MatchDTO();
-        dto.setId(match.getId());
-        return dto;
-    }
 }

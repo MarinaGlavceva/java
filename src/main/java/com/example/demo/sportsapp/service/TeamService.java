@@ -1,12 +1,13 @@
 package com.example.demo.sportsapp.service;
 
-import com.example.demo.sportsapp.entity.dto.TeamDTO;
 import com.example.demo.sportsapp.entity.Team;
+import com.example.demo.sportsapp.entity.dto.TeamDTO;
 import com.example.demo.sportsapp.repository.TeamRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class TeamService {
@@ -18,15 +19,26 @@ public class TeamService {
     }
 
     public List<TeamDTO> getAllTeams() {
-        return teamRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        List<Team> teams = teamRepository.findAll();
+        List<TeamDTO> resultList = new ArrayList<>();
+        for (Team team : teams) {
+            resultList.add(TeamDTO.builder()
+                    .id(team.getId())
+                    .name(team.getName())
+                    .leagueId(team.getLeague().getId())
+                    .build());
+        }
+        return resultList;
     }
 
     public TeamDTO getTeamById(Long id) {
-        return teamRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+        Optional<Team> team = teamRepository.findById(id);
+
+        return TeamDTO.builder()
+                .id(team.get().getId())
+                .name(team.get().getName())
+                .leagueId(team.get().getLeague().getId())
+                .build();
     }
 
     public TeamDTO createTeam(TeamDTO teamDTO) {
@@ -35,23 +47,28 @@ public class TeamService {
         teamRepository.save(team);
         return convertToDTO(team);
     }
+    private TeamDTO convertToDTO(Team team) {
+
+        return TeamDTO.builder()
+                .id(team.getId())
+                .name(team.getName())
+                .build();
+    }
 
     public TeamDTO updateTeam(Long id, TeamDTO teamDTO) {
-        Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+        Team team = new Team();
+        if (teamRepository.findById(id).isPresent()) {
+            team = teamRepository.findById(id).get();
+        }
         team.setName(teamDTO.getName());
         teamRepository.save(team);
         return convertToDTO(team);
     }
 
     public void deleteTeam(Long id) {
-        teamRepository.deleteById(id);
+        if (teamRepository.findById(id).isPresent()) {
+            teamRepository.deleteById(id);
+        }
     }
 
-    private TeamDTO convertToDTO(Team team) {
-        TeamDTO dto = new TeamDTO();
-        dto.setId(team.getId());
-        dto.setName(team.getName());
-        return dto;
-    }
-}
+   }

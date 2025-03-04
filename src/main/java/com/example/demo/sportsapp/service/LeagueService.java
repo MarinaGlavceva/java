@@ -1,12 +1,13 @@
 package com.example.demo.sportsapp.service;
 
-import com.example.demo.sportsapp.entity.dto.LeagueDTO;
 import com.example.demo.sportsapp.entity.League;
+import com.example.demo.sportsapp.entity.dto.LeagueDTO;
 import com.example.demo.sportsapp.repository.LeagueRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class LeagueService {
@@ -18,15 +19,24 @@ public class LeagueService {
     }
 
     public List<LeagueDTO> getAllLeagues() {
-        return leagueRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        List<League> leagues = leagueRepository.findAll();
+        List<LeagueDTO> resultList = new ArrayList<>();
+        for (League league : leagues) {
+            resultList.add(LeagueDTO.builder()
+                    .id(league.getId())
+                    .name(league.getName())
+                    .build());
+        }
+        return resultList;
     }
 
     public LeagueDTO getLeagueById(Long id) {
-        return leagueRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("League not found"));
+        Optional<League> league = leagueRepository.findById(id);
+
+        return LeagueDTO.builder()
+                .id(league.get().getId())
+                .name(league.get().getName())
+                .build();
     }
 
     public LeagueDTO createLeague(LeagueDTO leagueDTO) {
@@ -36,22 +46,28 @@ public class LeagueService {
         return convertToDTO(league);
     }
 
+    private LeagueDTO convertToDTO(League league) {
+
+        return LeagueDTO.builder()
+                .id(league.getId())
+                .name(league.getName())
+                .build();
+    }
+
     public LeagueDTO updateLeague(Long id, LeagueDTO leagueDTO) {
-        League league = leagueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("League not found"));
+        League league = new League();
+        if (leagueRepository.findById(id).isPresent()) {
+            league = leagueRepository.findById(id).get();
+        }
         league.setName(leagueDTO.getName());
         leagueRepository.save(league);
         return convertToDTO(league);
     }
 
     public void deleteLeague(Long id) {
-        leagueRepository.deleteById(id);
+        if (leagueRepository.findById(id).isPresent()) {
+            leagueRepository.deleteById(id);
+        }
     }
 
-    private LeagueDTO convertToDTO(League league) {
-        LeagueDTO dto = new LeagueDTO();
-        dto.setId(league.getId());
-        dto.setName(league.getName());
-        return dto;
-    }
 }
