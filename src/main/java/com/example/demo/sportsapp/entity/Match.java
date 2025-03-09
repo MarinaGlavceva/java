@@ -29,5 +29,7 @@ public class Match {
     @JoinColumn(name = "away_team_id")
     private Team awayTeam;
 
-
+    @ManyToOne
+    @JoinColumn(name = "league_id", nullable = false)
+    private League league;
 }
